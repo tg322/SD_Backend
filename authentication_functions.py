@@ -3,12 +3,8 @@
     Retrieves the secret key for encryption.
 
     Returns:
-        .encrypt_key object for use when encrypting.
+        .encrypt_key dict for use when encrypting.
     """
-
-
-
-
 def get_key():
 
     from build_response import internal_response
@@ -21,6 +17,16 @@ def get_key():
     else:
         return internal_response(success=False, message='Failed to fetch secret key from DB. From: get_key()')
     
+
+"""
+    Generates encrypted payload from specified data.
+
+    Args:
+        payload (any): The payload to encrypt.
+
+    Returns:
+        The data passed, encrypted in AES 256
+    """   
 def generate_encrypted_payload(payload):
     from build_response import internal_response
     import json
