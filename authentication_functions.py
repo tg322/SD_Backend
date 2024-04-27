@@ -49,3 +49,31 @@ def generate_encrypted_payload(payload):
         return internal_response(data=encrypted_payload, success=True)
     else:
         return key_str_response
+    
+
+"""
+    Compares a hashed provided password against a stored or other password.
+
+    Args:
+        plain_text_password (string): The password to be hashed and checked.
+        hashed_password (string | bytes): The stored or other hashed password to be checked against.
+
+    Returns:
+        True if the plain_text_password is the same as the existing provided hashed_password.
+        else: False if the plain_text_password is not the same.
+    """  
+    
+def check_password(plain_text_password, hashed_password):
+
+    import bcrypt
+
+    from build_response import internal_response
+
+    plain_text_password_bytes = plain_text_password.encode('utf-8')
+    
+    hashed_password_bytes = hashed_password.encode('utf-8') if isinstance(hashed_password, str) else hashed_password
+    
+    if bcrypt.checkpw(plain_text_password_bytes, hashed_password_bytes):
+        return internal_response(data=True, success=True)
+    else:
+        return internal_response(data=False, success=False)

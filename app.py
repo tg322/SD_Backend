@@ -1,7 +1,8 @@
 # app.py
 from flask import Flask
 from flask_cors import CORS
-from db_models import *  # Importing db and models
+from db_models import *
+  # Importing db and models
 
 def create_app():
     app = Flask(__name__)
