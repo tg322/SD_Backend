@@ -1,3 +1,5 @@
+
+
 def get_user_by_email(email):
     from db_models import users
     from build_response import internal_response
@@ -6,9 +8,11 @@ def get_user_by_email(email):
     if user:
         user_details = {
             'id': user.id,
-            'Email': user.Email,
-            'PassHash': user.PassHash,
-            'Role': user.Role
+            'firstName': user.first_name,
+            'lastName': user.last_name,
+            'email': user.Email,
+            'passHash': user.PassHash,
+            'role': user.Role
         }
         return internal_response(data=user_details, success=True)
     else:

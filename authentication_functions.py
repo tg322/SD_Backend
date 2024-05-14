@@ -5,6 +5,7 @@
     Returns:
         .encrypt_key dict for use when encrypting.
     """
+
 def get_key():
 
     from build_response import internal_response
@@ -12,7 +13,6 @@ def get_key():
     from db_models import encryption_key
     key_data = encryption_key.query.first()
     if key_data:
-        print(key_data)
         return internal_response(data=key_data.encrypt_key, success=True)
     else:
         return internal_response(success=False, message='Failed to fetch secret key from DB. From: get_key()')
@@ -76,4 +76,41 @@ def check_password(plain_text_password, hashed_password):
     if bcrypt.checkpw(plain_text_password_bytes, hashed_password_bytes):
         return internal_response(data=True, success=True)
     else:
-        return internal_response(data=False, success=False)
+        return internal_response(success=False, message='Passwords do not match. From: check_password()')
+    
+"""
+    Prepares a payload for encryption into a token format, use for authentication purposes.
+
+    Args:
+        user_data (dict): The user data to be encrypted and tokenised.
+
+    Returns:
+        token: The authentication token generated from the user_data supplied
+    """  
+
+def create_token(user_data):
+        
+        import datetime
+        import jwt
+        from build_response import internal_response
+
+        payload = {
+        'user_id': user_data['id'],
+        'email': user_data['email'],
+        'permissionLevel': user_data['role'],
+        'exp': datetime.datetime.now(datetime.timezone.utc).timestamp() + 24 * 60 * 60
+        }
+        
+        encryptedPayload = generate_encrypted_payload(payload)
+
+        if encryptedPayload['success'] == True:
+                
+            new_payload = {'data': encryptedPayload['data']}
+
+            secret_key = 'your-secret-key'
+
+            token = jwt.encode(new_payload, secret_key, algorithm='HS256')
+
+            return internal_response(data=token, success=True)
+        else:
+             return encryptedPayload
