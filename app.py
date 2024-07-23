@@ -8,10 +8,11 @@ from db_models import db  # Import only db, not all models globally if not neede
 auth_bp = Blueprint('auth', __name__)
 
 # Import route handlers
-from user_access_endpoints import login_user
+from user_access_endpoints import login_user, sign_up_user
 
 # Attach the route handler to the route
 auth_bp.route('/login', methods=['POST'])(login_user)
+auth_bp.route('/sign_up', methods=['POST'])(sign_up_user)
 
 def create_app():
     app = Flask(__name__)
