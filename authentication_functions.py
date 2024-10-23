@@ -1,12 +1,12 @@
 
-"""
+def get_key():
+
+    """
     Retrieves the secret key for encryption.
 
     Returns:
-        .encrypt_key dict for use when encrypting.
+        encrypt_key dict for use when encrypting.
     """
-
-def get_key():
 
     from build_response import internal_response
 
@@ -16,9 +16,10 @@ def get_key():
         return internal_response(data=key_data.encrypt_key, success=True)
     else:
         return internal_response(success=False, message='Failed to fetch secret key from DB. From: get_key()')
-    
+      
+def generate_encrypted_payload(payload):
 
-"""
+    """
     Generates encrypted payload from specified data.
 
     Args:
@@ -26,8 +27,8 @@ def get_key():
 
     Returns:
         The data passed, encrypted in AES 256
-    """   
-def generate_encrypted_payload(payload):
+    """ 
+
     from build_response import internal_response
     import json
     from jwcrypto import jwe, jwk
@@ -49,21 +50,21 @@ def generate_encrypted_payload(payload):
         return internal_response(data=encrypted_payload, success=True)
     else:
         return key_str_response
-    
-
-"""
-    Compares a hashed provided password against a stored or other password.
-
-    Args:
-        plain_text_password (string): The password to be hashed and checked.
-        hashed_password (string | bytes): The stored or other hashed password to be checked against.
-
-    Returns:
-        True if the plain_text_password is the same as the existing provided hashed_password.
-        else: False if the plain_text_password is not the same.
-    """  
+     
     
 def check_password(plain_text_password, hashed_password):
+
+    """
+        Compares a hashed provided password against a stored or other password.
+
+        Args:
+            plain_text_password (string): The password to be hashed and checked.
+            hashed_password (string | bytes): The stored or other hashed password to be checked against.
+
+        Returns:
+            True if the plain_text_password is the same as the existing provided hashed_password.
+            else: False if the plain_text_password is not the same.
+        """ 
 
     import bcrypt
 
@@ -78,17 +79,19 @@ def check_password(plain_text_password, hashed_password):
     else:
         return internal_response(success=False, message='Passwords do not match. From: check_password()')
     
-"""
-    Prepares a payload for encryption into a token format, use for authentication purposes.
 
-    Args:
-        user_data (dict): The user data to be encrypted and tokenised.
-
-    Returns:
-        token: The authentication token generated from the user_data supplied
-    """  
 
 def create_token(user_data):
+        
+        """
+            Prepares a payload for encryption into a token format, use for authentication purposes.
+
+            Args:
+                user_data (dict): The user data to be encrypted and tokenised.
+
+            Returns:
+                token: The authentication token generated from the user_data supplied
+            """  
         
         import datetime
         import jwt
