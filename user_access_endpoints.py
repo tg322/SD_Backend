@@ -25,7 +25,7 @@ def login_user():
             dict: an external_response object.
     """
 
-    from flask import request
+    from flask import request, jsonify, make_response
     from build_response import external_response
     from db_access_functions import get_user_by_email
     data = request.get_json()
@@ -41,7 +41,7 @@ def login_user():
 
             if token_response['success']:
                 # Initialize user dictionary correctly before using it
-                
+
                 user = {
                     'firstName': user_data['firstName'],
                     'lastName': user_data['lastName'],
@@ -49,13 +49,32 @@ def login_user():
                     'email': user_data['email']
                 }
 
-                response = {
+                data = {
                     'permissionLevel': user_data['role'],
-                    'token': token_response['data'],  # Ensure this passes the token, not the whole response
+                    # 'token': token_response['data'],  # Ensure this passes the token, not the whole response
                     'user': user
                 }
+                
+                # Define cookies to set
+                cookies = [{
+                    'key': 'token',
+                    'value': token_response['data'],
+                    'httponly': True,
+                    'secure': False,   # Set to True in production
+                    'samesite': 'Lax',
+                    'max_age': 24 * 60 * 60
+                }]
 
-            return external_response(data=response, status=200, message='Login Successful.')
+                response = external_response(
+                    data = data,
+                    status= 200,
+                    message= 'Login Successful.',
+                    success= True,
+                    cookies= cookies
+                                             
+                )
+
+            return response
         else:
             return external_response(status=400, message=check_password_response['message'])
     else:
