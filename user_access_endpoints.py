@@ -41,6 +41,7 @@ def login_user():
 
             if token_response['success']:
                 # Initialize user dictionary correctly before using it
+                
                 user = {
                     'firstName': user_data['firstName'],
                     'lastName': user_data['lastName'],

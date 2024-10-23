@@ -18,10 +18,10 @@ def create_app():
     app = Flask(__name__)
     CORS(app)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/software_agile'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Good practice
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)  # Initialize db with the app
-    app.register_blueprint(auth_bp, url_prefix='/api/auth')  # Customize url_prefix as needed
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')  # url_prefix
 
     return app
 

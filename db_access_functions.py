@@ -28,7 +28,7 @@ def get_user_by_email(email):
             }
             return internal_response(data=user_details, success=True, message='User found successfully.')
         else:
-            return internal_response(success=True, message='No user found with the provided email.', data={})
+            return internal_response(success=False, message='No user found with the provided email.')
 
     except Exception as e:
         return internal_response(success=False, message=f'An error occurred: {str(e)}')
