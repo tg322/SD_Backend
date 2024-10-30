@@ -61,9 +61,9 @@ def login_user():
 
             return response
         else:
-            return external_response(status=400, message=check_password_response['message'])
+            return external_response(status=403, message=check_password_response['message'], success=False)
     else:
-        return external_response(status=400, message=get_user_by_email_response['message'])
+        return external_response(status=403, message=get_user_by_email_response['message'])
     
 
 def sign_up_user():
