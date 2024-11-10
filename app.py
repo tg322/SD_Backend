@@ -7,15 +7,16 @@ from db_models import db  # Import only db, not all models globally if not neede
 auth_bp = Blueprint('auth', __name__)
 
 # Import route handlers
-from user_access_endpoints import login_user, sign_up_user
+from user_access_endpoints import login_user, sign_up_user, test_get_auth_token
 
 # Attach the route handlers to the blueprint
 auth_bp.route('/login', methods=['POST'])(login_user)
+auth_bp.route('/test', methods=['GET'])(test_get_auth_token)
 auth_bp.route('/sign_up', methods=['POST'])(sign_up_user)
 
 def create_app():
     app = Flask(__name__)
-    CORS(app, resources={r"/*": {"origins": "*"}})
+    CORS(app, supports_credentials=True, resources={ "/*": {"origins": ["https://www.tg322.co.uk"]}})
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/software_agile'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -28,4 +29,4 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
