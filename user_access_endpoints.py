@@ -45,9 +45,10 @@ def login_user():
                     'key': 'token',
                     'value': token_response['data'],
                     'httponly': True,
-                    'secure': False,   # Set to True in production
-                    'samesite': 'Lax',
-                    'max_age': 24 * 60 * 60
+                    'secure': True,   # Set to True in production
+                    'samesite': 'None',  # Change to 'None' to allow cross-origin
+                    'max_age': 24 * 60 * 60,
+                    'path': '/'
                 }]
 
                 response = external_response(
@@ -123,6 +124,22 @@ def sign_up_user():
             external_response(status=400, message=insert_user_response['message'])
     else:
         return external_response(status=404, message='Account already exists.')
+    
+
+def test_get_auth_token():
+    from flask import request
+    from build_response import external_response
+    print("Cookies received:", request.cookies)
+    auth_token = request.cookies.get('token')
+    # from authentication_functions import decrypt_token
+    print(auth_token)
+    # decrypt_token(auth_token)
+    return external_response(
+                    data = auth_token,
+                    status= 200,
+                    message= 'Login Successful.',
+                    success= True                       
+                )
     
     
 

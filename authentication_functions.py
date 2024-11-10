@@ -1,4 +1,3 @@
-
 def get_key():
 
     """
@@ -37,10 +36,9 @@ def generate_encrypted_payload(payload):
     payload_str = json.dumps(payload)
     key_str_response = get_key()
 
-    # Correct way to access dictionary keys
     if key_str_response['success'] == True:
-        # Assuming the key is stored correctly as a dict; if it's a simple string, this needs adjustment
-        key = jwk.JWK.from_json(key_str_response['data'])  # Adjusted for typical JWK usage
+        
+        key = jwk.JWK.from_json(key_str_response['data'])
 
         jwetoken = jwe.JWE(plaintext=payload_str.encode('utf-8'),
                            protected={"alg": "A256KW", "enc": "A256CBC-HS512"})
@@ -117,3 +115,25 @@ def create_token(user_data):
             return internal_response(data=token, success=True)
         else:
              return encryptedPayload
+        
+def decrypt_token(payload):
+    import json
+    from jwcrypto import jwe, jwk
+    key_str_response = get_key()
+
+    if key_str_response['success'] == True:
+
+        key_dict = json.loads(key_str_response['data'])
+        key = jwk.JWK(**key_dict)
+
+        jwetoken = jwe.JWE()
+
+        secret_key = 'your-secret-key'
+        jwetoken.deserialize(payload, key=key)
+        
+        decrypted_payload = jwetoken.payload.decode('utf-8')
+        decrypted_payload_dict = json.loads(decrypted_payload)
+        print(decrypted_payload_dict)
+    else:
+        print('error getting key at decrypt_token')
+        
