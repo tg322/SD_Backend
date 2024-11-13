@@ -115,7 +115,7 @@ def sign_up_user():
 
             response = {
                 'permissionLevel': user_data['role'],
-                'token': token_response['data'],  # Ensure this passes the token, not the whole response
+                'token': token_response['data'],  # Ensure this passes the token, not the whole response testing with new comment
                 'user': user
             }
         
