@@ -68,13 +68,10 @@ def login_user():
     
 
 def sign_up_user():
-
     """
         Sign Up User Endpoint.
-
         purpose:
             To create a new user, with provided details.
-
         Returns:
             dict: an external_response object.
     """
@@ -85,45 +82,65 @@ def sign_up_user():
 
     data = request.get_json()
     get_user_by_email_response = get_user_by_email(data['email'])
-
-    #If fetching user was unsuccessful, return error from response
-    if not get_user_by_email_response['success']:
+    # If fetching user was unsuccessful, return error from response
+    if get_user_by_email_response['success']:
         return external_response(status=400, message=get_user_by_email_response['message'])
     
-    #If no user was found, continue with account creation
-    if not get_user_by_email_response['data']:
+    # If no user was found, continue with account creation
+    if not get_user_by_email_response['success']:
 
         password = data['password'].encode('utf-8')
         from bcrypt import hashpw, gensalt
         hash = hashpw(password, gensalt())
-        insert_user_response = insert_user(first_name=data['first_name'], last_name=data['last_name'], email=data['email'], pass_hash=hash, role=1)
+        insert_user_response = insert_user(first_name=data['firstName'], last_name=data['lastName'], email=data['email'], pass_hash=hash, role=1)
+        # Ensure we return an error if insertion fails
+        if not insert_user_response['success']:
+            return external_response(status=400, message=insert_user_response['message'])
+        
+        user_data = insert_user_response['data']
+        from authentication_functions import create_token
+        token_response = create_token(user_data)
 
-        if(insert_user_response['success']):
-            user_data = insert_user_response
-            from authentication_functions import create_token
-            token_response = create_token(insert_user_response)
-
-            if not token_response['success']:
-                return external_response(status=400, message=token_response['message'])
-            
-            user = {
+        # Check for token creation success
+        if not token_response['success']:
+            return external_response(status=400, message=token_response['message'])
+        
+        user = {
             'firstName': user_data['firstName'],
             'lastName': user_data['lastName'],
-            'picture': '', #Picture not implemented yet
+            'picture': '',  # Picture not implemented yet
             'email': user_data['email']
-            }
+        }
 
-            response = {
-                'permissionLevel': user_data['role'],
-                'token': token_response['data'],  # Ensure this passes the token, not the whole response testing with new comment
-                'user': user
-            }
+        data = {
+            'permissionLevel': user_data['role'],
+            'user': user
+        }
         
-            return external_response(status=200, message='Account created successfully.', data=response)
-        else:
-            external_response(status=400, message=insert_user_response['message'])
+        # Define cookies to set
+        cookies = [{
+            'key': 'token',
+            'value': token_response['data'],
+            'httponly': True,
+            'secure': True,  # Set to True in production
+            'samesite': 'None',  # Change to 'None' to allow cross-origin
+            'max_age': 24 * 60 * 60,
+            'path': '/'
+        }]
+
+        response = external_response(
+            data=data,
+            status=200,
+            message='Account created successfully.',
+            success=True,
+            cookies=cookies
+        )
+    
+        return response
     else:
+        # Return error if account already exists
         return external_response(status=404, message='Account already exists.')
+
     
 
 def test_get_auth_token():

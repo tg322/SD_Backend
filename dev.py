@@ -12,7 +12,7 @@ from user_access_endpoints import login_user, sign_up_user, test_get_auth_token
 # Attach the route handlers to the blueprint
 auth_bp.route('/login', methods=['POST'])(login_user)
 auth_bp.route('/test', methods=['GET'])(test_get_auth_token)
-auth_bp.route('/sign_up', methods=['POST'])(sign_up_user)
+auth_bp.route('/signup', methods=['POST'])(sign_up_user)
 
 def create_app():
     app = Flask(__name__)
