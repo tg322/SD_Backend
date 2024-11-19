@@ -146,17 +146,24 @@ def sign_up_user():
 def test_get_auth_token():
     from flask import request
     from build_response import external_response
-    print("Cookies received:", request.cookies)
+    from authentication_functions import verify_token
     auth_token = request.cookies.get('token')
-    # from authentication_functions import decrypt_token
-    print(auth_token)
-    # decrypt_token(auth_token)
-    return external_response(
-                    data = auth_token,
-                    status= 200,
-                    message= 'Login Successful.',
-                    success= True                       
-                )
+    from authentication_functions import decrypt_token
+    decrypted_token = decrypt_token(auth_token)
+    print(decrypted_token)
+    verify_token_response = verify_token(decrypted_token['data'])
+    if verify_token_response['success']:
+        return external_response(
+                        status= 200,
+                        message= 'Token valid',
+                        success= True                       
+                    )
+    else:
+        return external_response(
+                        status= 403,
+                        message= 'Token invalid',
+                        success= False                       
+                    )
     
     
 
