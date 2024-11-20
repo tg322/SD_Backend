@@ -29,7 +29,7 @@ def create_app():
             }
         },
     )
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/software_agile'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://flask_api:mondayPANAMA0_@localhost/software_agile'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)  # Initialize db with the app
