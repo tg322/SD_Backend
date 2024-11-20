@@ -1,3 +1,4 @@
+
 def get_user_by_email(email):
 
     """
@@ -73,3 +74,40 @@ def insert_user(first_name, last_name, email, pass_hash, role = 1):
     
     except Exception as e:
         return internal_response(success=False, message=f'An error occurred: {str(e)}')
+
+def get_all_tickets():
+    from db_models import Tickets, ticket_category, users, db
+    from sqlalchemy.orm import aliased
+    from build_response import internal_response
+    category_alias = aliased(ticket_category)
+    user_alias = aliased(users)
+
+    all_tickets = []
+
+    response = {}
+    
+    all_tickets = db.session.query(Tickets, category_alias, user_alias)\
+    .join(category_alias, Tickets.ticket_category == category_alias.id)\
+    .join(user_alias, Tickets.ticket_from_id == user_alias.id).all()
+    
+    if all_tickets:
+        serialized_data = [
+        {
+            'ticket_id': ticket.id,
+            'ticket_subject': ticket.ticket_subject,
+            'category': category.category,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'ticket_date': ticket.ticket_date_sent,
+            'ticket_status': ticket.ticket_status,
+        }
+        for ticket, category, user in all_tickets
+        ]
+
+        response = {'tickets': serialized_data}
+        
+        return internal_response(success=True, message='Tickets retrieved successfully.', data=response)
+    else:
+        return internal_response(success=False, message='Failed to fetch tickets')
+
+    
