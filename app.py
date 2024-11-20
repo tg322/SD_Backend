@@ -16,7 +16,19 @@ auth_bp.route('/signup', methods=['POST'])(sign_up_user)
 
 def create_app():
     app = Flask(__name__)
-    CORS(app, supports_credentials=True, resources={"/*": {"origins": ["https://www.tg322.co.uk"]}})
+    CORS(
+        app,
+        supports_credentials=True,
+        resources={
+            r"/*": {
+                "origins": [
+                    "https://www.tg322.co.uk"  # Local Development Frontend
+                ],
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+                "allow_headers": ["Content-Type", "Authorization"],
+            }
+        },
+    )
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/software_agile'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
