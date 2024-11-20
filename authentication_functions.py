@@ -32,7 +32,6 @@ def generate_encrypted_payload(payload):
     from build_response import internal_response
     import json
     from jwcrypto import jwe, jwk
-    import jwt
 
     payload_str = json.dumps(payload)
     key_str_response = get_key()
