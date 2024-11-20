@@ -40,5 +40,10 @@ def create_app():
 # Instantiate the app at the module level
 app = create_app()
 
+@app.after_request
+def log_headers(response):
+    print("Response Headers:", response.headers)
+    return response
+
 if __name__ == '__main__':
     app.run()
