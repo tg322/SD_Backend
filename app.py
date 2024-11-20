@@ -18,7 +18,6 @@ def create_app():
     app = Flask(__name__)
     CORS(
         app,
-        supports_credentials=True,
         resources={
             r"/*": {
                 "origins": [
