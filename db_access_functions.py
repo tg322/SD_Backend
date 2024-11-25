@@ -110,4 +110,54 @@ def get_all_tickets():
     else:
         return internal_response(success=False, message='Failed to fetch tickets')
 
-    
+
+def get_ticket(id):
+    from db_models import Tickets, ticket_category, users, db
+    from sqlalchemy.orm import aliased
+    from build_response import internal_response
+    category_alias = aliased(ticket_category)
+    user_alias = aliased(users)
+    ticket = db.session.query(Tickets, category_alias, user_alias)\
+                .join(category_alias, Tickets.ticket_category == category_alias.id)\
+                .join(user_alias, Tickets.ticket_from_id == user_alias.id)\
+                .filter(Tickets.id == id).first()
+    if ticket:
+        ticket, category, user = ticket
+
+        serialized_data = {
+            'ticket_id': ticket.id,
+            'ticket_subject': ticket.ticket_subject,
+            'ticket_body': ticket.ticket_body,
+            'category': category.category,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'ticket_date': ticket.ticket_date_sent,
+            'ticket_status': ticket.ticket_status,
+        }
+
+        return internal_response(success=True, message='Ticket retrieved successfully.', data=serialized_data)
+    else:
+        return internal_response(success=False, message='Failed to fetch ticket.')
+
+def closeTicketByID(id):
+    from db_models import Tickets, db
+    from build_response import internal_response
+    ticket = Tickets.query.get(id)
+    ticket.ticket_status = 'Closed'
+    db.session.commit()
+    return internal_response(success=True, message='Ticket closed successfully.')
+
+def openTicketByID(id):
+    from db_models import Tickets, db
+    from build_response import internal_response
+    ticket = Tickets.query.get(id)
+    ticket.ticket_status = 'Open'
+    db.session.commit()
+    return internal_response(success=True, message='Ticket opened successfully.')
+
+def deleteTicketByID(id):
+    from db_models import Tickets, db
+    from build_response import internal_response
+    Tickets.query.filter(Tickets.id == id).delete()
+    db.session.commit()
+    return internal_response(success=True, message='Ticket deleted successfully.')
