@@ -14,8 +14,12 @@ auth_bp.route('/login', methods=['POST'])(login_user)
 auth_bp.route('/test', methods=['GET'])(test_get_auth_token)
 auth_bp.route('/signup', methods=['POST'])(sign_up_user)
 
-from tickets import get_tickets
+from tickets import get_tickets, get_ticket_by_id, close_ticket, open_ticket, delete_ticket
 tickets_bp.route('/gettickets', methods=['GET'])(get_tickets)
+tickets_bp.route('/getticket', methods=['POST'])(get_ticket_by_id)
+tickets_bp.route('/closeticket', methods=['POST'])(close_ticket)
+tickets_bp.route('/openticket', methods=['POST'])(open_ticket)
+tickets_bp.route('/deleteticket', methods=['POST'])(delete_ticket)
 
 def create_app():
     app = Flask(__name__)
