@@ -150,13 +150,31 @@ def test_get_auth_token():
     auth_token = request.cookies.get('token')
     from authentication_functions import decrypt_token
     decrypted_token = decrypt_token(auth_token)
-    print(decrypted_token)
-    verify_token_response = verify_token(decrypted_token['data'])
+    decrypted_token_data = decrypted_token['data']
+    verify_token_response = verify_token(decrypted_token_data)
     if verify_token_response['success']:
-        return external_response(
+        from db_access_functions import get_user_by_email
+        get_user_by_email_response = get_user_by_email(decrypted_token_data['email'])
+        if get_user_by_email_response['success']:
+            from authentication_functions import create_token
+            token_response = create_token(get_user_by_email_response['data'])
+            if token_response['success']:
+                return external_response(
                         status= 200,
-                        message= 'Token valid',
+                        message= 'Token generated successfully.',
                         success= True                       
+                    ) 
+            else:
+               return external_response(
+                        status= 403,
+                        message= 'Failed to generate token.',
+                        success= False                       
+                    ) 
+        else:
+            return external_response(
+                        status= 403,
+                        message= 'User not found.',
+                        success= False                      
                     )
     else:
         return external_response(
