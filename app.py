@@ -3,10 +3,9 @@ from flask import Blueprint, Flask
 from flask_cors import CORS
 from db_models import db  # Import only db, not all models globally if not needed
 
-# Define the Blueprint
 auth_bp = Blueprint('auth', __name__)
 tickets_bp = Blueprint('tickets', __name__)
-
+users_bp = Blueprint('users', __name__)
 # Import route handlers
 from user_access_endpoints import login_user, sign_up_user, test_get_auth_token, logout
 
@@ -16,12 +15,20 @@ auth_bp.route('/me', methods=['GET'])(test_get_auth_token)
 auth_bp.route('/signup', methods=['POST'])(sign_up_user)
 auth_bp.route('/logout', methods=['POST'])(logout)
 
-from tickets import get_tickets, get_ticket_by_id, close_ticket, open_ticket, delete_ticket
+from tickets import get_tickets, get_ticket_by_id, close_ticket, open_ticket, delete_ticket, create_ticket, get_ticket_categories
 tickets_bp.route('/gettickets', methods=['GET'])(get_tickets)
 tickets_bp.route('/getticket', methods=['POST'])(get_ticket_by_id)
 tickets_bp.route('/closeticket', methods=['POST'])(close_ticket)
 tickets_bp.route('/openticket', methods=['POST'])(open_ticket)
 tickets_bp.route('/deleteticket', methods=['POST'])(delete_ticket)
+tickets_bp.route('/createticket', methods=['POST'])(create_ticket)
+tickets_bp.route('/getcategories', methods=['GET'])(get_ticket_categories)
+
+
+from user_access_endpoints import create_user
+from roles import get_roles
+users_bp.route('/createuser', methods=['POST'])(create_user)
+users_bp.route('/getroles', methods=['GET'])(get_roles)
 
 def create_app():
     app = Flask(__name__)
