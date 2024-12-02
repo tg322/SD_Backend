@@ -10,7 +10,7 @@ def login_user():
             dict: an external_response object.
     """
 
-    from flask import request, jsonify, make_response
+    from flask import request
     from build_response import external_response
     from db_access_functions import get_user_by_email
     data = request.get_json()
@@ -226,7 +226,67 @@ def logout():
         cookies=cookies
     )
     return response
-    
 
+
+def create_user():
+    from flask import request
+    from build_response import external_response
+    from authentication_functions import verify_token
+    auth_token = request.cookies.get('token')
+    data = request.get_json()
+    if auth_token:
+        from authentication_functions import decrypt_token
+        decrypted_token = decrypt_token(auth_token)
+        decrypted_token_data = decrypted_token['data']
+        verify_token_response = verify_token(decrypted_token_data)
+        if decrypted_token_data['permissionLevel'] >= 2:
+            if verify_token_response['success']:
+                from db_access_functions import get_user_by_email, insert_user
+                get_user_by_email_response = get_user_by_email(data['email'])
+                if not get_user_by_email_response['success']:
+                    password = data['password'].encode('utf-8')
+                    from bcrypt import hashpw, gensalt
+                    hash = hashpw(password, gensalt())
+                    insert_user_response = insert_user(first_name=data['firstName'], last_name=data['lastName'], email=data['email'], pass_hash=hash, role=data['roleId'])
+                    if insert_user_response['success']:
+                        return external_response(
+                                    status=200,
+                                    message='Account created successfully.',
+                                    success=True
+                                    )
+                    else:
+                        return external_response(
+                                    status=400,
+                                    message=insert_user_response['message'],
+                                    success=False
+                                    )
+                else:
+                    # User already exists
+                    return external_response(
+                        status=400,
+                        message='User already exists.',
+                        success=False
+                        )
+            else:
+                # return token invalid
+                return external_response(
+                    status=403,
+                    message='Token invalid.',
+                    success=False
+                    )
+        else:
+            # return permission not high enough
+            return external_response(
+                status=403,
+                message='No token present.',
+                success=False
+                )
+    else:
+        # return no token present
+        return external_response(
+            status=403,
+            message='Permission level not high enough.',
+            success=False
+            )
     
     

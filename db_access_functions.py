@@ -161,3 +161,64 @@ def deleteTicketByID(id):
     Tickets.query.filter(Tickets.id == id).delete()
     db.session.commit()
     return internal_response(success=True, message='Ticket deleted successfully.')
+
+def get_all_roles():
+    from db_models import roles, db
+    userRoles = roles.query.all()
+
+    all_userRoles = []
+
+    if userRoles:
+        from build_response import internal_response
+        for userRole in userRoles:
+            all_userRoles.append({
+                'id': userRole.id,
+                'role': userRole.role_name
+            })
+        return internal_response(success=True, message='Roles retrieved successfully.', data=all_userRoles)
+    else:
+        return internal_response(success=False, message='Roles retrieved unsuccessfully.')
+    
+
+def create_ticket(ticket_subject, ticket_body, ticket_category, ticket_from_id):
+
+    try:
+
+        from db_models import Tickets, db
+        from build_response import internal_response
+
+        new_ticket = Tickets(
+            ticket_subject=ticket_subject, 
+            ticket_body=ticket_body, 
+            ticket_category=ticket_category, 
+            ticket_from_id=ticket_from_id
+        )
+        db.session.add(new_ticket)
+        db.session.commit()
+
+        return internal_response(success=True, message='Ticket created successfully.')
+    
+    except Exception as e:
+        return internal_response(success=False, message=f'An error occurred: {str(e)}')
+    
+def get_all_categories():
+    try:
+
+        from db_models import ticket_category, db
+        from build_response import internal_response
+
+        categories = ticket_category.query.all()
+
+        all_categories = []
+
+        if categories:
+            for category in categories:
+                all_categories.append({
+                    'id': category.id,
+                    'category': category.category
+                })
+
+        return internal_response(success=True, message='Categories retrieved successfully.', data=all_categories)
+
+    except Exception as e:
+        return internal_response(success=False, message=f'An error occurred: {str(e)}')
