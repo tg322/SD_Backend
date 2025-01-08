@@ -32,18 +32,9 @@ users_bp.route('/getroles', methods=['GET'])(get_roles)
 
 def create_app():
     app = Flask(__name__)
-    CORS(
-        app,
-        resources={
-            r"/*": {
-                "origins": [
-                    "https://www.tg322.co.uk"  # Local Development Frontend
-                ],
-                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-                "allow_headers": ["Content-Type", "Authorization"],
-            }
-        },
-    )
+
+    app.after_request(add_cors_headers)
+
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://flask_api:mondayPANAMA0_@localhost/software_agile'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -53,6 +44,16 @@ def create_app():
     app.register_blueprint(users_bp, url_prefix='/api/users')
 
     return app
+
+def add_cors_headers(response):
+    """
+    Minimal CORS headers, if needed (NGINX should handle this).
+    """
+    response.headers["Access-Control-Allow-Origin"] = "https://www.tg322.co.uk"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    return response
 
 # Instantiate the app at the module level
 app = create_app()
